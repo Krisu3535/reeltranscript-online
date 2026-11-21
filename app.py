@@ -66,6 +66,20 @@ def display_progress(token:str):
         st.error(state['message'])
     else:
         st.info('No active job. Add URLs and click Start.')
+    if failures:
+        errors=[(url,row.get('error','')) for url,row in results.items()
+                if row.get('status')=='failed']
+        with st.expander(f'⚠️ Why did {failures} video(s) fail?',expanded=True):
+            st.error('First failure: '+(errors[0][1] or 'Unknown error')[:500])
+            st.markdown('''**Troubleshooting:** A status of **Failed** only means that this URL could not be processed.
+- **Cannot parse data / Unsupported URL:** Facebook did not expose video audio to this downloader. TurboScribe may still accept it because it uses a different retrieval system.
+- **Login required / 403 / access denied:** Video is restricted or the host refused automated access. Do **not** provide Facebook passwords or cookies.
+- **FFmpeg / file not found:** A server dependency or download failed.
+- **Model download / memory:** Free hosting may have insufficient resources.
+
+Try **one** authorized public video using its direct `facebook.com/reel/...` address, if available, rather than a `/share/r/...` shortcut. If it fails, repeated retries generally won't help; use the original file with a transcription service instead.''')
+            st.dataframe([{'URL':u,'Error':err or 'Unknown'} for u,err in errors],
+                         use_container_width=True,hide_index=True)
     if results:
         preview=[{
             'Status':obj.get('status',''),
