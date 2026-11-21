@@ -106,8 +106,14 @@ class JobManager:
 
     def _run(self,token:str,queue:list[str],model_name:str,language:str|None):
         job=self.jobs[token]
+        manager=self
+        class LazyModel:
+            # Load the Whisper model only if a video actually downloads.
+            # Facebook access errors should not waste time downloading model weights.
+            def transcribe(self,*args,**kwargs):
+                return manager.get_model(model_name).transcribe(*args,**kwargs)
         try:
-            model=self.get_model(model_name)
+            model=LazyModel()
             for i,url in enumerate(queue,start=1):
                 if job.stop_event.is_set():
                     break
