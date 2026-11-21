@@ -25,7 +25,7 @@ class CoreTests(unittest.TestCase):
         u='https://www.facebook.com/reel/123'
         text=f'Link: {u}, https://fb.watch/abc/\n{u} https://evil.com/x'
         self.assertEqual(extract_links(text),[u,'https://fb.watch/abc/'])
-        self.assertEqual(len(extract_links('\n'.join(f'https://fb.watch/{n}/' for n in range(800))),MAX_URLS)
+        self.assertEqual(len(extract_links('\n'.join(f'https://fb.watch/{n}/' for n in range(800)))),MAX_URLS)
 
     def test_srt(self):
         self.assertEqual(as_timestamp(62.155),'00:01:02,155')
